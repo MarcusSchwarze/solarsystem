@@ -36,7 +36,7 @@ export const planets = [
     P:10759, rot:.44, size:6, tex:'saturn.jpg', col:0xf1d8ad, tilt:26,
     rings:{inner:7.5,outer:12.5,color:'saturnringcolor.jpg',alpha:'saturnringpattern.gif'},
     m:[
-      {n:'Titan',     a:22,P:15.945,size:1.4,tex:'titania.jpg',   col:0xd3a34f,inc:.3485},
+      {n:'Titan',     a:22,P:15.945,size:1.4,tex:'titan.jpg',   col:0xd3a34f,inc:.3485},
       {n:'Enceladus', a:14,P:1.370, size:.6, tex:'enceladus.jpg',col:0xb0e0ff,inc:.009}
     ] },
 
