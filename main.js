@@ -6,7 +6,7 @@ import * as THREE from 'https://unpkg.com/three@0.164.0/build/three.module.js?mo
 import { OrbitControls }  from 'https://unpkg.com/three@0.164.0/examples/jsm/controls/OrbitControls.js?module';
 import { CSS2DRenderer, CSS2DObject } from 'https://unpkg.com/three@0.164.0/examples/jsm/renderers/CSS2DRenderer.js?module';
 
-import { AU, DEG, INC_SCALE, sphere, kepler, tex } from './utils.js';
+import { AU, DEG, INC_SCALE, sphere, kepler, tex } from './utils.js'; 
 import { planets } from './planets.js';
 
 /* --------------------------------------------------
