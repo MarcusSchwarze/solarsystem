@@ -8,25 +8,26 @@ export const AU         = 75;                // 1 Astronomische Einheit in Szene
 export const INC_SCALE  = 10;                // Y‑Streckung für Bahnneigung
 export const DEG        = Math.PI / 180;     // Grad → Radiant
 
-/* Lokaler Texturpfad -------------------------------------------------------- */
-const BASE = './textures/planets/';          // <‑‑ hier liegen die JPG/GIF‑Dateien
-
-/* Drei‑Loader mit CORS‑Freigabe (falls extern genutzt) */
+/* Texturlader -------------------------------------------------------------- */
 const loader = new THREE.TextureLoader();
 loader.setCrossOrigin('anonymous');
 
+/* Neutrale Standardtextur (einheitlich) */
+export const neutralTexture = loader.load('./textures/neutral.png');
+
+/* Hilfsfunktion: Planetentextur laden oder neutrale zurückgeben */
 export function tex(file){
-  return loader.load(BASE + file);
+  return file ? loader.load('./textures/planets/' + file) : neutralTexture;
 }
 
-/* Kugel mit Basis‑Material + optionaler Textur */
-export function sphere(radius, textureFile, color = 0xffffff){
+/* Kugel mit Basis‑Material + (ggf.) Textur */
+export function sphere(radius, textureFile = null, color = 0xffffff){
   const mat = new THREE.MeshLambertMaterial({
+    map: tex(textureFile),
     color,
     emissive: 0x111111,
     emissiveIntensity: 0.6,
   });
-  if (textureFile) mat.map = tex(textureFile);
   return new THREE.Mesh(
     new THREE.SphereGeometry(radius, 64, 32),
     mat,
