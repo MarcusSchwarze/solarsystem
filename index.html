@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Sonnensystem – Demo (modular)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Head-up-Display -->
+  <div id="hud">
+    <label>Tempo:
+      <input id="speed" type="range" min="1" max="5000" value="400">
+      <span id="speedValue"></span>
+    </label>
+    <label>Helligkeit:
+      <input id="light" type="range" min="500" max="8000" value="3000">
+      <span id="lightValue"></span>
+    </label>
+    <div style="display:flex;gap:6px;align-items:center">
+      <select id="target"></select>
+      <button id="flyBtn">Flieg mich dahin</button>
+    </div>
+    <div id="dateBox"></div>
+  </div>
+
+  <!-- Einstiegspunkt -->
+  <script type="module" src="main.js"></script>
+</body>
+</html>
