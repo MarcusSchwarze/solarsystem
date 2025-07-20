@@ -12,50 +12,49 @@ export const DEG        = Math.PI / 180;     // Grad → Radiant
 const loader = new THREE.TextureLoader();
 loader.setCrossOrigin('anonymous');
 
-/* Fallback‑Textur (neutral) */
+/* Neutrale Ersatztextur */
 export const neutralTexture = loader.load('./textures/neutral.png');
 
-/* Bild laden oder neutral zurückgeben */
+/* Textur laden, bei fehlender Datei neutrale zurückgeben */
 export function tex(file){
   if (!file) return neutralTexture;
   return loader.load('./textures/planets/' + file);
 }
 
-/* Material‑Kugel */
-export function sphere(radius, textureFile=null, color){
+/* Kugel‑Mesh mit Textur oder Grundfarbe */
+export function sphere(radius, textureFile = null, color = 0xffffff){
   const params = {
-    color : (color === undefined || color === null) ? 0xffffff : color,
+    color,
     emissive: 0x111111,
     emissiveIntensity: 0.6,
   };
-  const t = tex(textureFile);
-  if (t) params.map = t;
+  const map = tex(textureFile);
+  if (map) params.map = map;
 
+  const mat = new THREE.MeshLambertMaterial(params);
   return new THREE.Mesh(
     new THREE.SphereGeometry(radius, 64, 32),
-    new THREE.MeshLambertMaterial(params),
+    mat,
   );
 }
 
-/* Kepler‑Solver (Newton‑Iteration) ---------------------------------------- */
+/* Keplersche Bahn­berechnung (numerische Näherung) */
 export function kepler(a, e, i, Ω, ω, M0){
   let E = M0;
   for (let k = 0; k < 6; k++){
     E = M0 + e * Math.sin(E);
   }
-  const ν   = 2 * Math.atan2(
-                Math.sqrt(1 + e) * Math.sin(E / 2),
-                Math.sqrt(1 - e) * Math.cos(E / 2),
-              );
-  const r   = a * (1 - e * Math.cos(E));
+  const ν = 2 * Math.atan2(Math.sqrt(1 + e) * Math.sin(E / 2),
+                           Math.sqrt(1 - e) * Math.cos(E / 2));
+  const r = a * (1 - e * Math.cos(E));
 
   const cosΩ = Math.cos(Ω), sinΩ = Math.sin(Ω);
   const cosi = Math.cos(i),  sini = Math.sin(i);
-  const coswν = Math.cos(ω + ν), sinwν = Math.sin(ω + ν);
+  const cosw = Math.cos(ω + ν), sinw = Math.sin(ω + ν);
 
-  const x = r * (cosΩ * coswν - sinΩ * sinwν * cosi);
-  const y = r * (sinwν * sini) * INC_SCALE;
-  const z = r * (sinΩ * coswν + cosΩ * sinwν * cosi);
+  const x = r * (cosΩ * cosw - sinΩ * sinw * cosi);
+  const y = r * (sinw * sini) * INC_SCALE;
+  const z = r * (sinΩ * cosw + cosΩ * sinw * cosi);
 
   return new THREE.Vector3(x, y, z);
 }
