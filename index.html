@@ -2,29 +2,28 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <title>Sonnensystem – Demo (modular)</title>
+  <title>Sonnensystem – Demo</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- HUD: Glas-Design, nur Regler + Dropdown -->
   <div id="hud">
     <label>Tempo:
       <input id="speed" type="range" min="1" max="400" value="5" step="1">
       <span id="speedValue"></span>
     </label>
+
     <label>Helligkeit:
       <input id="light" type="range" min="500" max="5000" value="3000" step="100">
       <span id="lightValue"></span>
     </label>
+
     <select id="target"></select>
-    <button id="flyBtn">Flieg mich dahin</button><br>
-    <label>
-      <input type="checkbox" id="realism"> Realismus
-    </label>
+
     <div id="dateBox"></div>
   </div>
 
-  <!-- Hauptskript -->
   <script type="module" src="main.js"></script>
 </body>
 </html>
