@@ -1,30 +1,30 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Sonnensystem – Demo (modular)</title>
+  <meta charset="utf-8">
+  <title>Sonnensystem – Demo (modular)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Head-up-Display -->
   <div id="hud">
     <label>Tempo:
-      <input id="speed" type="range" min="1" max="5000" value="400">
+      <input id="speed" type="range" min="1" max="400" value="5" step="1">
       <span id="speedValue"></span>
     </label>
     <label>Helligkeit:
-      <input id="light" type="range" min="500" max="8000" value="3000">
+      <input id="light" type="range" min="500" max="5000" value="3000" step="100">
       <span id="lightValue"></span>
     </label>
-    <div style="display:flex;gap:6px;align-items:center">
-      <select id="target"></select>
-      <button id="flyBtn">Flieg mich dahin</button>
-    </div>
+    <select id="target"></select>
+    <button id="flyBtn">Flieg mich dahin</button><br>
+    <label>
+      <input type="checkbox" id="realism"> Realismus
+    </label>
     <div id="dateBox"></div>
   </div>
 
-  <!-- Einstiegspunkt -->
+  <!-- Hauptskript -->
   <script type="module" src="main.js"></script>
 </body>
 </html>
