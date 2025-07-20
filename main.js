@@ -7,7 +7,7 @@ import { OrbitControls }             from 'https://unpkg.com/three@0.164.0/examp
 import { CSS2DRenderer, CSS2DObject} from 'https://unpkg.com/three@0.164.0/examples/jsm/renderers/CSS2DRenderer.js?module';
 
 import { AU, DEG, INC_SCALE, sphere, kepler, tex } from './utils.js?v=3';
-import { planets }                                 from './planets.js?v=3';
+import { planets }                                 from './planets.js?v=4';
 
 /* ── Grund‑Setup ─────────────────────────────────── */
 const scene    = new THREE.Scene();
