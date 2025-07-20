@@ -1,6 +1,5 @@
 /* --------------------------------------------------
-   Sonnensystem‑Demo (modular)
-   Szene aufbauen, Animation steuern
+   Sonnensystem‑Demo – klickbare Körper
 -------------------------------------------------- */
 import * as THREE from 'https://unpkg.com/three@0.164.0/build/three.module.js?module';
 import { OrbitControls }  from 'https://unpkg.com/three@0.164.0/examples/jsm/controls/OrbitControls.js?module';
@@ -75,8 +74,8 @@ sun.add(new CSS2DObject(Object.assign(
    Planeten & Monde erzeugen
 -------------------------------------------------- */
 const SIZE_SCALE = 3;        // Planetenradius‑Faktor (Demo Mode)
-
-const bodies = [];           // Planetengruppen + Monde
+const bodies = [];           // Speichert alle Datenstrukturen
+const bodyIndex = new Map(); // bodyId → Objekt für schnelles Lookup
 
 planets.forEach(p => {
   const group = new THREE.Object3D();
@@ -85,6 +84,7 @@ planets.forEach(p => {
   /* Planetenkugel */
   const pMesh = sphere(p.size * SIZE_SCALE, p.tex, p.col);
   pMesh.rotation.z = p.tilt * DEG;
+  pMesh.userData.bodyId = p.n;                       // eindeutige Kennung
   pMesh.add(new CSS2DObject(Object.assign(
     document.createElement('div'),
     { className: 'label', textContent: p.n },
@@ -114,6 +114,7 @@ planets.forEach(p => {
   const moons = [];
   p.m.forEach(m => {
     const mMesh = sphere(m.size * SIZE_SCALE, m.tex, m.col);
+    mMesh.userData.bodyId = `${p.n}|${m.n}`;        // Planet|Mond
     mMesh.add(new CSS2DObject(Object.assign(
       document.createElement('div'),
       { className: 'label', textContent: m.n, style: 'font-size:10px' },
@@ -123,6 +124,8 @@ planets.forEach(p => {
   });
 
   bodies.push({ p, group, mesh: pMesh, moons });
+  bodyIndex.set(p.n, { group, mesh: pMesh, planet: p, moons });
+  moons.forEach(m => bodyIndex.set(`${p.n}|${m.n}`, { moon: m, planet: p, group }));
 });
 
 /* --------------------------------------------------
@@ -164,20 +167,20 @@ let tFlyStart, camStart, followRadius = 50, followAngle = 0;
 let followTarget, desiredOffset;
 const ALIGN_SPEED = 0.5;   // rad/s
 
-function flyToSelection() {
-  const v = sel.value.split('|');
-  const b = bodies.find(x => x.p.n === v[0]);
+function flyTo(bodyId) {
+  const info = bodyIndex.get(bodyId);
+  if (!info) return;
 
+  /* Ziel‑Vektor bestimmen */
   let dest, r;
-  if (v.length === 1) {                 // Planet
-    dest          = b.group.position.clone();
-    r             = b.p.size * SIZE_SCALE;
-    followTarget  = b.group;
-  } else {                              // Mond
-    const m       = b.moons.find(mm => mm.n === v[1]);
-    dest          = b.group.position.clone().add(m.mesh.position);
-    r             = m.size * SIZE_SCALE;
-    followTarget  = m.mesh;
+  if (info.moon) {               // Mond
+    dest         = info.group.position.clone().add(info.moon.mesh.position);
+    r            = info.moon.size * SIZE_SCALE;
+    followTarget = info.moon.mesh;
+  } else {                       // Planet
+    dest         = info.group.position.clone();
+    r            = info.planet.size * SIZE_SCALE;
+    followTarget = info.group;
   }
 
   followRadius = r * 6;
@@ -193,6 +196,9 @@ function flyToSelection() {
   followAngle = 0;
   desiredOffset = null;
 
+  /* Dropdown synchronisieren, falls Klick */
+  sel.value = bodyId;
+
   (function step() {
     if (!fly) return;
     const t = Math.min(1, (performance.now() - tFlyStart) / 4000);
@@ -204,9 +210,26 @@ function flyToSelection() {
   })();
 }
 
-/* Neuer Automatismus: Dropdown löst Flug aus */
-sel.onchange = flyToSelection;
-document.getElementById('flyBtn').onclick = flyToSelection;
+/* Dropdown löst Flug aus */
+sel.onchange = () => flyTo(sel.value);
+/* Button bleibt optional */
+document.getElementById('flyBtn').onclick = () => flyTo(sel.value);
+
+/* --------------------------------------------------
+   Klick‑Interaktion (Raycaster)
+-------------------------------------------------- */
+const raycaster = new THREE.Raycaster();
+const pointer   = new THREE.Vector2();
+
+renderer.domElement.addEventListener('pointerdown', event => {
+  pointer.x =  (event.clientX / innerWidth)  * 2 - 1;
+  pointer.y = -(event.clientY / innerHeight) * 2 + 1;
+
+  raycaster.setFromCamera(pointer, camera);
+  const intersects = raycaster.intersectObjects(scene.children, true);
+  const hit = intersects.find(i => i.object.userData.bodyId);
+  if (hit) flyTo(hit.object.userData.bodyId);
+});
 
 /* Zoom im Follow‑Modus */
 window.addEventListener('wheel', e => {
@@ -268,7 +291,6 @@ function animate() {
   const tgt = followTarget ? followTarget.getWorldPosition(new THREE.Vector3()) : null;
 
   if (align && tgt) {
-    /* Nachflugphase: Kamera hinter Planet zur Sonne ausrichten */
     const sunDir = tgt.clone().sub(sun.position).normalize();
     const targetOffset = sunDir.clone().negate().multiplyScalar(followRadius);
     if (!desiredOffset) {
