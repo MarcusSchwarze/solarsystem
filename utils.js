@@ -8,35 +8,34 @@ export const AU         = 75;                // 1 Astronomische Einheit in Szene
 export const INC_SCALE  = 10;                // Y‑Streckung für Bahnneigung
 export const DEG        = Math.PI / 180;     // Grad → Radiant
 
-/* Texturlader -------------------------------------------------------------- */
+/* Textur‑Loader */
 const loader = new THREE.TextureLoader();
 loader.setCrossOrigin('anonymous');
 
-/* Neutrale Standardtextur (einheitlich) */
-export const neutralTexture = loader.load('./textures/neutral.png');
-
-/* Hilfsfunktion: Planetentextur laden oder neutrale zurückgeben */
 export function tex(file){
-  return file ? loader.load('./textures/planets/' + file) : neutralTexture;
+  if (!file) return null;
+  return loader.load('./textures/planets/' + file);
 }
 
-/* Kugel mit Basis‑Material + (ggf.) Textur */
+/* Kugel mit (optionaler) Textur */
 export function sphere(radius, textureFile = null, color = 0xffffff){
-  const mat = new THREE.MeshLambertMaterial({
-    map: tex(textureFile),
+  const params = {
     color,
     emissive: 0x111111,
     emissiveIntensity: 0.6,
-  });
+  };
+  const texture = tex(textureFile);
+  if (texture) params.map = texture;
+
+  const mat = new THREE.MeshLambertMaterial(params);
   return new THREE.Mesh(
     new THREE.SphereGeometry(radius, 64, 32),
     mat,
   );
 }
 
-/* Keplersche Bahn­berechnung (numerische Näherung) */
+/* Kepler‑Solver */
 export function kepler(a, e, i, Ω, ω, M0){
-  // Newton‑Iteration (6 Schritte reichen hier aus)
   let E = M0;
   for (let k = 0; k < 6; k++){
     E = M0 + e * Math.sin(E);
